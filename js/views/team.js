@@ -45,8 +45,11 @@
     const gf = home ? f.hg : f.ag, ga = home ? f.ag : f.hg;
     const res = done ? (gf > ga ? 'W' : gf === ga ? 'D' : 'L') : null;
     const c = U.comp(f.comp);
+    // a cup tie the game has not drawn yet has no opponent
+    const oppCell = opp == null ? '<b class="tf-tbd">To be decided</b>'
+      : `${U.crest(opp, 22)}<b>${esc(U.team(opp).name)}</b>`;
     return `<li class="tf-row" style="--c:${esc(c.color)}"><span class="tf-date">${U.date(f.date, 'short')}</span>
-      <span class="tf-opp"${U.hasClub(opp) ? ` data-team="${opp}" role="link" tabindex="0"` : ''}>${U.crest(opp, 22)}<b>${esc(U.team(opp).name)}</b></span>
+      <span class="tf-opp"${opp != null && U.hasClub(opp) ? ` data-team="${opp}" role="link" tabindex="0"` : ''}>${oppCell}</span>
       <span class="tf-ha">${home ? 'H' : 'A'}</span>
       <span class="tf-r">${done ? `${gf}–${ga} <i class="res res-${res}">${res}</i>` : esc(U.time12(f.time))}</span></li>`;
   }
@@ -63,7 +66,7 @@
   function fixtures(id, c) {
     const list = (c && c.fixtures) || [];
     if (!list.length) return '';
-    return `<section class="sec"><div class="sec-head"><h2>Fixtures and results</h2><span class="sub">${list.length} matches, all competitions</span></div>
+    return `<section class="sec"><div class="sec-head"><h2>Fixtures and results</h2><span class="sub">${FC.u.count(list.length, 'match', 'matches')}, all competitions</span></div>
       <ol class="tf-list">${[...list].sort((a, b) => a.date.localeCompare(b.date)).map((f) => row(f, id)).join('')}</ol></section>`;
   }
 
@@ -73,7 +76,7 @@
     const by = {};
     c.squad.forEach((p) => { (by[U.posGroup(p.pos)] = by[U.posGroup(p.pos)] || []).push(p); });
     const ours = Number(c.id) === D().meta.clubId;
-    return `<section class="sec"><div class="sec-head"><h2>Squad</h2><span class="sub">${c.squad.length} players</span></div>
+    return `<section class="sec"><div class="sec-head"><h2>Squad</h2><span class="sub">${FC.u.count(c.squad.length, 'player')}</span></div>
       ${LINES.filter(([k]) => by[k]).map(([k, l]) => `<h3 class="tm-line">${l}</h3><ol class="sq-list tm-squad">${by[k].sort((a, b) => b.ovr - a.ovr).map((p) => `<li>
         <button type="button" class="sq-row" data-player="${p.id}"${ours ? '' : ` data-club="${c.id}"`}>${U.portrait({ ...p, short: p.name }, 40)}
         <span class="sq-main"><b><span class="sq-pos">${esc(p.pos)}</span>${esc(p.name)}</b><small>${[p.age, p.shirt ? `#${p.shirt}` : null, U.wageYrTag(p.wage), U.contract(p.contractEnd)].filter(Boolean).map(esc).join(' · ')}</small></span>

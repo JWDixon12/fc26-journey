@@ -65,8 +65,13 @@
     if (z.promo != null) {
       return `The top ${word(z.promo)} go up automatically and the next ${word(z.playoff)} contest the play-offs for the last place. The bottom ${word(z.rel)} are relegated.`;
     }
-    return `Top ${word(z.cl)} qualify for the Champions League, ${z.el === 1 ? 'the next' : `the next ${word(z.el)}`} for the Europa League.`
-      + `${z.playoff ? ` ${z.playoff === 1 ? 'One club plays' : `${word(z.playoff)} clubs play`} a relegation play-off;` : ''} the bottom ${word(z.rel)} go down.`;
+    // a zone set to 0 is left out of the sentence (e.g. a league with no division below it relegates nobody)
+    const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+    const parts = [];
+    if (z.cl) parts.push(`Top ${word(z.cl)} qualify for the Champions League${z.el ? `, ${z.el === 1 ? 'the next' : `the next ${word(z.el)}`} for the Europa League` : ''}.`);
+    if (z.playoff) parts.push(`${cap(z.playoff === 1 ? 'one club plays' : `${word(z.playoff)} clubs play`)} a relegation play-off.`);
+    if (z.rel) parts.push(`The bottom ${word(z.rel)} go down.`);
+    return parts.join(' ');
   }
 
   FC.views.league = {

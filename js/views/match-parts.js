@@ -16,7 +16,7 @@
     const u = U();
     const stat = (t) => {
       const s = m.shots.filter((x) => x.team === t);
-      return `${s.length} shots · ${s.filter((x) => x.outcome === 'goal').length} goals · ${s.reduce((a, x) => a + x.xg, 0).toFixed(2)} xG`;
+      return `${FC.u.count(s.length, 'shot')} · ${FC.u.count(s.filter((x) => x.outcome === 'goal').length, 'goal')} · ${s.reduce((a, x) => a + x.xg, 0).toFixed(2)} xG`;
     };
     return `<div class="panel-head"><h2>Shot map</h2><p class="sub">Each side attacking up</p></div>
       ${pair(f, (t) => FC.pitch.svg(FC.pitch.shots(m.shots.filter((s) => s.team === t), col(t), u.personName), { orient: 'half', label: `${u.team(t).name} shots` }), stat)}

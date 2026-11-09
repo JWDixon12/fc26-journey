@@ -31,7 +31,7 @@
     const parts = r && r.attack != null
       ? [['ATT', r.attack], ['MID', r.midfield], ['DEF', r.defence], ['OVR', r.overall]]
       : [['Players', active.length], ['Avg OVR', avg.toFixed(1)]];
-    return `<section class="sec"><div class="sec-head"><h2>Squad</h2><a class="sub" href="#squad">${active.length} players</a></div>
+    return `<section class="sec"><div class="sec-head"><h2>Squad</h2><a class="sub" href="#squad">${FC.u.count(active.length, 'player')}</a></div>
       <p class="numline">${parts.map(([l, v]) => `<span><small>${l}</small><b>${v}</b></span>`).join('')}</p></section>`;
   }
 
@@ -50,7 +50,7 @@
     const y = seasonEndYear();
     const list = D().squad.filter((p) => p.contractEnd <= y && p.status !== 'loaned_out').sort((a, b) => b.wage - a.wage);
     if (!list.length) return '';
-    return `<section class="sec"><div class="sec-head"><h2>Contracts ending ${y}</h2><span class="sub">${list.length} players</span></div>
+    return `<section class="sec"><div class="sec-head"><h2>Contracts ending ${y}</h2><span class="sub">${FC.u.count(list.length, 'player')}</span></div>
       <table class="data"><thead><tr><th>Player</th><th>Pos</th><th class="n">Age</th><th class="n">Wage/yr</th><th class="n">Ends</th></tr></thead><tbody>
       ${list.map((p) => `<tr data-player="${p.id}" tabindex="0"><td><b>${esc(p.name)}</b></td><td>${esc(p.pos)}</td><td class="n">${p.age}</td><td class="n">${FC.u.wageYr(p.wage)}</td><td class="n">30 Jun ${p.contractEnd}</td></tr>`).join('')}
       </tbody></table></section>`;

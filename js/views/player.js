@@ -33,6 +33,7 @@
       const hist = p.ovrHistory || [];
       const delta = hist.length > 1 ? p.ovr - hist[0].ovr : 0;
       const status = p.status === 'injured' && p.injury ? `<span class="pl-flag inj">${U.esc(p.injury.type)} · back ${U.date(p.injury.returnDate)}</span>`
+        : p.loanIn ? `<span class="pl-flag loan">On loan from ${U.esc(p.loanIn.club || U.teamName(p.loanIn.from))} until ${U.date(p.loanIn.until)}</span>`
         : p.status === 'loaned_out' && p.loan ? `<span class="pl-flag loan">On loan at ${U.esc(p.loan.club)} until ${U.date(p.loan.until)}</span>`
           : p.status === 'suspended' ? '<span class="pl-flag sus">Suspended</span>' : '<span class="pl-flag fit">Available</span>';
       const find = ((window.CAREER.youth || {}).finds || {})[String(p.id)];
@@ -53,7 +54,8 @@
           <section class="panel"><div class="panel-head"><h3>Contract</h3></div>
             <dl class="tiles"><div class="tile"><dt>Value</dt><dd>${U.money(p.value)}</dd></div>
               <div class="tile"><dt>Wage / year</dt><dd>${U.wageYr(p.wage)}</dd></div>
-              <div class="tile"><dt>Contract</dt><dd>${U.contract(p.contractEnd)}</dd><small>${seasonsLeft <= 1 ? 'Final season' : `${seasonsLeft} seasons left`}</small></div>
+              ${p.loanIn ? `<div class="tile"><dt>Loan</dt><dd>${U.date(p.loanIn.until, 'short')}</dd><small>from ${U.esc(p.loanIn.club || U.teamName(p.loanIn.from))}</small></div>`
+                : `<div class="tile"><dt>Contract</dt><dd>${U.contract(p.contractEnd)}</dd><small>${seasonsLeft <= 1 ? 'Final season' : `${seasonsLeft} seasons left`}</small></div>`}
               <div class="tile"><dt>Release</dt><dd>${p.releaseClause ? U.money(p.releaseClause) : 'No clause'}</dd></div></dl></section>
           ${hist.length > 1 ? `<section class="panel"><div class="panel-head"><h3>Overall history</h3><p class="sub">${hist.map((h) => `${U.date(h.date, 'short')}: ${h.ovr}`).join(' · ')}</p></div>
             <div class="chart" id="pp-ovr"></div></section>` : ''}

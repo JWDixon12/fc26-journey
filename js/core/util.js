@@ -202,7 +202,11 @@
   const posGroup = (pos) =>
     pos === 'GK' ? 'GK' : /B$|CB|WB/.test(pos) ? 'DEF' : /DM|CM|AM|^[LR]M$/.test(pos) ? 'MID' : 'ATT';
 
+  /** '1 player', '3 players'; pass the plural when it isn't word + s. */
+  const count = (n, word, many) => `${n} ${n === 1 ? word : many || `${word}s`}`;
+
   FC.u = {
+    count,
     pensTag, pensR,
     hasClub, loadClub, clubColor, shortName, shortenName, esc, money, wageYr, wageYrTag, height, weight, contract, num, date, time12, parseDate, daysBetween, MONTHS, MONTHS_LONG, DAYS,
     league, leagueRows, team, teamName, comp, player, personName, us, isUs, opponent, result, played, upcoming,

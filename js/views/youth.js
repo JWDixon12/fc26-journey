@@ -52,7 +52,7 @@
 
   function foundBy(id) {
     const f = (D().youth.finds || {})[String(id)];
-    return f ? `<span class="yo-found"> · ${FC.u.esc(f.scout.split(' ').slice(-1)[0])}</span>` : '';
+    return f ? `<span class="yo-found">&nbsp;· ${FC.u.esc(f.scout.split(' ').slice(-1)[0])}</span>` : '';
   }
 
   function prospectRow(p) {
@@ -71,6 +71,7 @@
       const Y = D().youth;
       const grads = D().squad.filter((p) => p.homegrown).sort((a, b) => b.ovr - a.ovr);
       const prospects = [...Y.prospects].sort((a, b) => b.ovr - a.ovr || a.age - b.age);
+      const ageRange = (l) => { const lo = Math.min(...l.map((p) => p.age)), hi = Math.max(...l.map((p) => p.age)); return lo === hi ? `age ${lo}` : `ages ${lo}–${hi}`; };
       const bestScout = Y.scouts.reduce((b, s) => (!b || s.judgement + s.experience > b.judgement + b.experience ? s : b), null);
       const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
       const groups = GROUPS.map(([g, label]) => [label, prospects.filter((p) => groupOf(p.pos) === g)]).filter(([, l]) => l.length);
@@ -79,7 +80,7 @@
         <section class="yo-sec"><h2 class="yo-h">Scouting network</h2>
           ${Y.scouts.length ? `<div class="yo-scouts">${Y.scouts.map((s) => scoutCard(s, s === bestScout)).join('')}</div>` : '<p class="empty-note">No scouts hired.</p>'}</section>
         <div class="yo-grid">
-          <section class="yo-sec panel yo-pros"><div class="panel-head"><h2>Prospects</h2><p class="sub">${prospects.length ? `Youth squad · ages ${Math.min(...prospects.map((p) => p.age))}–${Math.max(...prospects.map((p) => p.age))}` : ''}</p></div>
+          <section class="yo-sec panel yo-pros"><div class="panel-head"><h2>Prospects</h2><p class="sub">${prospects.length ? `Youth squad · ${ageRange(prospects)}` : ''}</p></div>
             ${groups.length ? groups.map(([label, list]) => `<h3 class="yo-group">${label}<span>${list.length}</span></h3><ol class="yo-list">${list.map(prospectRow).join('')}</ol>`).join('') : '<p class="empty-note">No prospects in the youth squad.</p>'}</section>
           <section class="yo-sec panel yo-grads"><div class="panel-head"><h2>Academy graduates</h2><p class="sub">Promoted to the senior squad</p></div>
             ${grads.length ? `<ul class="yo-gradlist">${grads.map((p) => `<li data-player="${p.id}" tabindex="0">${U.portrait(p, 52)}<div class="yo-who"><b>${U.esc(p.name)}</b>

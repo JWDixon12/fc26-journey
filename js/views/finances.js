@@ -7,8 +7,10 @@
   function expiry() {
     const U = FC.u;
     const now = U.parseDate(D().meta.gameDate);
-    const players = D().squad.filter((p) => p.status !== 'loaned_out').sort((a, b) => a.contractEnd - b.contractEnd || b.wage - a.wage);
-    const maxY = Math.max(...players.map((p) => p.contractEnd));
+    // a loaned-in player's deal with us ends when the loan does (his parent-club contract is not ours)
+    const until = (p) => (p.loanIn ? U.parseDate(p.loanIn.until).getFullYear() : p.contractEnd);
+    const players = D().squad.filter((p) => p.status !== 'loaned_out').sort((a, b) => until(a) - until(b) || b.wage - a.wage);
+    const maxY = Math.max(...players.map(until));
     const end = (y) => new Date(y, 5, 30);
     const span = end(maxY) - now;
     const pct = (d) => Math.max(0, Math.min(100, ((d - now) / span) * 100));
@@ -17,10 +19,10 @@
     const thisSeason = now.getMonth() >= 6 ? now.getFullYear() + 1 : now.getFullYear();
     return `<div class="expiry"><div class="ex-axis" aria-hidden="true"><span></span><span></span><div>${years.map((y) => `<i style="left:${pct(end(y))}%">Jun ${y}</i>`).join('')}</div></div>
       ${players.map((p) => {
-        const soon = p.contractEnd <= thisSeason;
-        return `<div class="ex-row ${soon ? 'soon' : ''}" data-player="${p.id}" tabindex="0" data-tip="${U.esc(`<strong>${U.esc(p.name)}</strong>Contract thru June ${p.contractEnd} · ${U.wageYrTag(p.wage)} · age ${p.age}`)}">
-          <span class="ex-name">${U.esc(p.name)}</span><span class="ex-flag">${soon ? '<span class="status-tag s-at_risk">Final year</span>' : ''}</span>
-          <span class="ex-track">${years.map((y) => `<i class="ex-tick" style="left:${pct(end(y))}%"></i>`).join('')}<span class="ex-bar" style="width:${pct(end(p.contractEnd))}%"></span></span></div>`;
+        const soon = until(p) <= thisSeason;
+        return `<div class="ex-row ${soon ? 'soon' : ''}" data-player="${p.id}" tabindex="0" data-tip="${U.esc(`<strong>${U.esc(p.name)}</strong>${p.loanIn ? `On loan from ${U.esc(p.loanIn.club || '')} until ${U.date(p.loanIn.until)}` : `Contract thru June ${p.contractEnd}`} · ${U.wageYrTag(p.wage)} · age ${p.age}`)}">
+          <span class="ex-name">${U.esc(p.name)}</span><span class="ex-flag">${p.loanIn ? '<span class="status-tag">Loan</span>' : soon ? '<span class="status-tag s-at_risk">Final year</span>' : ''}</span>
+          <span class="ex-track">${years.map((y) => `<i class="ex-tick" style="left:${pct(end(y))}%"></i>`).join('')}<span class="ex-bar" style="width:${pct(end(until(p)))}%"></span></span></div>`;
       }).join('')}</div>`;
   }
 
@@ -35,7 +37,7 @@
       return `<header class="page-head"><div><h1>Financials</h1><p>${F.history.length ? `Week by week, ${U.date(F.history[0].date)} to ${U.date(last.date)}.` : `${U.esc(D().meta.season)} season.`}</p></div>
         <dl class="tiles head-tiles four"><div class="tile"><dt>${last.balance == null && D().club.clubWorth ? 'Club worth' : 'Club balance'}</dt><dd>${last.balance != null ? U.money(last.balance) : (D().club.clubWorth ? U.money(D().club.clubWorth) : '—')}</dd></div><div class="tile"><dt>Transfer budget</dt><dd>${U.money(D().club.transferBudget)}</dd></div>
           <div class="tile"><dt>Wage bill / year</dt><dd>${U.wageYr(bill)}</dd>${budget ? `<small>of ${U.wageYr(budget)} budget</small>` : `<small>${U.money(bill)} a week</small>`}</div>
-          ${budget ? `<div class="tile"><dt>Wage budget used</dt><dd>${used}%</dd><div class="meter ${used > 95 ? 'm-crit' : used > 85 ? 'm-warn' : 'm-good'}" role="meter" aria-valuenow="${used}" aria-valuemin="0" aria-valuemax="100" aria-label="Wage budget used"><i style="width:${Math.min(100, used)}%"></i></div></div>` : `<div class="tile"><dt>Squad value</dt><dd>${U.money(U.sum(D().squad, (p) => p.value || 0))}</dd></div>`}</dl></header>
+          ${budget ? `<div class="tile"><dt>Wage budget used</dt><dd>${used}%</dd><div class="meter ${used > 95 ? 'm-crit' : used > 85 ? 'm-warn' : 'm-good'}" role="meter" aria-valuenow="${used}" aria-valuemin="0" aria-valuemax="100" aria-label="Wage budget used"><i style="width:${Math.min(100, used)}%"></i></div></div>` : (U.sum(D().squad, (p) => p.value || 0) ? `<div class="tile"><dt>Squad value</dt><dd>${U.money(U.sum(D().squad, (p) => p.value || 0))}</dd></div>` : '')}</dl></header>
         <div class="g12">
           <section class="panel stretch fi-bal-p" style="--span:7"><div class="panel-head"><h2>Balance and transfer budget</h2><p class="sub">Weekly, ${U.esc(D().meta.currency || '€')}</p></div><div class="chart" id="fi-bal"></div></section>
           <section class="panel stretch fi-wage-p" style="--span:5"><div class="panel-head"><h2>Wage bill (per year)</h2><p class="sub"></p></div><div class="chart" id="fi-wage"></div></section>

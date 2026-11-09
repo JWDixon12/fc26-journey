@@ -28,7 +28,7 @@
       const ins = T.ours.filter((t) => U.isUs(t.to));
       const outs = T.ours.filter((t) => !U.isUs(t.to));
       const spent = U.sum(ins, (t) => t.fee || 0), got = U.sum(outs, (t) => t.fee || 0);
-      return `<header class="page-head"><div><h1>Transfers</h1><p>${T.ours.length} deals this season. Fees in ${U.esc(D().meta.currency || '€')}.</p></div>
+      return `<header class="page-head"><div><h1>Transfers</h1><p>${T.ours.length} ${T.ours.length === 1 ? 'deal' : 'deals'} this season. Fees in ${U.esc(D().meta.currency || '€')}.</p></div>
         <dl class="tiles head-tiles four"><div class="tile"><dt>Spent</dt><dd>${U.money(spent)}</dd></div><div class="tile"><dt>Received</dt><dd>${U.money(got)}</dd></div>
           <div class="tile"><dt>Net spend</dt><dd>${U.money(spent - got)}</dd></div><div class="tile"><dt>Budget left</dt><dd>${U.money(D().club.transferBudget)}</dd></div></dl></header>
         <div class="g12 tr-grid">

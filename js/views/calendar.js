@@ -80,7 +80,7 @@
       if (!mode) mode = window.innerWidth < 760 ? 'list' : 'grid';
       const fx = D().fixtures;
       const p = fx.filter((f) => f.played).length;
-      return `<header class="page-head"><div><h1>Calendar</h1><p>${fx.length} fixtures · ${p} played · ${fx.length - p} to go</p></div>
+      return `<header class="page-head"><div><h1>Calendar</h1><p>${FC.u.count(fx.length, 'fixture')} · ${p} played · ${fx.length - p} to go</p></div>
         <div class="panel-head tools">
           <div class="legend">${D().competitions.map((c) => `<span><i class="sw" style="--c:${U.esc(c.color)}"></i>${U.esc(c.name)}</span>`).join('')}</div>
           <div class="seg" role="group" aria-label="Calendar layout">
