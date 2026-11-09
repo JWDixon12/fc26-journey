@@ -93,8 +93,9 @@
   function current(p) {
     const s = p.season;
     if (!s || !s.apps) return null;
-    return derive({ season: window.CAREER.meta.season.replace('/', '-'), y: 9999, age: p.age, club: window.CAREER.meta.clubId, country: null,
-      comp: 'This career', type: 'all', mp: s.apps, starts: s.starts, min: s.mins, gls: s.goals, ast: s.assists, pk: null, crdy: s.yellows, crdr: s.reds,
+    const ours = !p.clubId || p.clubId === window.CAREER.meta.clubId;  // other clubs' players carry clubId (club sheet)
+    return derive({ season: window.CAREER.meta.season.replace('/', '-'), y: 9999, age: p.age, club: ours ? window.CAREER.meta.clubId : p.clubId, country: null,
+      comp: ours ? 'This career' : 'This season', type: 'all', mp: s.apps, starts: s.starts, min: s.mins, gls: s.goals, ast: s.assists, pk: null, crdy: s.yellows, crdr: s.reds,
       ga: null, cs: p.pos === 'GK' ? s.cleanSheets : null, saves: null, current: true });
   }
 
@@ -256,7 +257,7 @@
     if (has && !p.history.seasons.some((s) => st.tab === 'all' || s.compType === st.tab)) st.tab = 'all';
     const types = new Set(((p.history && p.history.seasons) || []).map((s) => s.compType));
     if (!st.tab) st.tab = 'all';
-    return `${honours(p)}<section class="panel pp-wide hy" data-hy="${p.id}"><div class="panel-head"><h3>Standard stats</h3><span class="sub">${has ? 'Club career to 30 June 2026' : 'This career'}</span></div>
+    return `${honours(p)}<section class="panel pp-wide hy" data-hy="${p.id}"><div class="panel-head"><h3>Standard stats</h3><span class="sub">${has ? `Club career to ${FC.u.date(window.CAREER.meta.historyTo || '2026-06-30')}` : 'This season'}</span></div>
       ${chart(p)}<div class="seg hy-tabs" role="tablist">${TABS.filter(([k]) => k === 'all' || types.has(k)).map(([k, l]) => `<button type="button" role="tab" data-hytab="${k}" aria-pressed="${st.tab === k}">${l}</button>`).join('')}</div>
       <div class="hy-body">${table(p)}</div></section>`;
   }
